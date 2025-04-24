@@ -1,0 +1,156 @@
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Mobile Menu Toggle
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            // Optional: Change burger icon to 'X' icon
+            const icon = menuToggle.querySelector('i');
+            if (navLinks.classList.contains('active')) {
+                icon.setAttribute('data-lucide', 'x');
+            } else {
+                icon.setAttribute('data-lucide', 'menu');
+            }
+            lucide.createIcons(); // Re-render icon
+        });
+
+        // Close menu when a link is clicked (optional)
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    menuToggle.querySelector('i').setAttribute('data-lucide', 'menu');
+                    lucide.createIcons();
+                }
+            });
+        });
+    }
+
+    // Smooth Scrolling (Redundant if CSS scroll-behavior: smooth is sufficient, but good fallback)
+    // Optional: If more control is needed or CSS isn't supported widely enough
+    // document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    //     anchor.addEventListener('click', function (e) {
+    //         e.preventDefault();
+    //         const targetId = this.getAttribute('href');
+    //         const targetElement = document.querySelector(targetId);
+    //         if(targetElement) {
+    //              // Adjust for sticky header height if necessary
+    //             const headerOffset = document.querySelector('.site-header')?.offsetHeight || 0;
+    //             const elementPosition = targetElement.getBoundingClientRect().top;
+    //             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+    //             window.scrollTo({
+    //                 top: offsetPosition,
+    //                 behavior: "smooth"
+    //             });
+    //         }
+    //     });
+    // });
+
+
+    // Scroll-Triggered Animations using Intersection Observer
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Add delay if specified
+                const delay = entry.target.dataset.delay;
+                if (delay) {
+                    entry.target.style.transitionDelay = `${delay}ms`;
+                }
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target); // Optional: Animate only once
+            }
+        });
+    }, {
+        threshold: 0.1 // Trigger when 10% of the element is visible
+    });
+
+    animatedElements.forEach(el => {
+        observer.observe(el);
+    });
+
+
+    // Interactive Info Cards (Toggle Expandable Content on Mobile/Tap)
+    const infoCards = document.querySelectorAll('.info-card');
+    infoCards.forEach(card => {
+        // Use click for simplicity, works for tap too
+        card.addEventListener('click', (e) => {
+             // Prevent toggling if clicking the CTA button inside the card
+            if (e.target.classList.contains('card-cta') || e.target.closest('.card-cta')) {
+                // Let the button/link handle its own action
+                return;
+            }
+
+            // Only toggle 'active' class if screen width is below desktop breakpoint (e.g., 768px)
+             if (window.innerWidth < 768) {
+                // Optionally, close other cards when one is opened
+                // infoCards.forEach(otherCard => {
+                //     if (otherCard !== card) {
+                //         otherCard.classList.remove('active');
+                //     }
+                // });
+                card.classList.toggle('active');
+             }
+        });
+    });
+
+
+    // Simple Contact Form Handler Placeholder
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // Prevent default form submission
+
+            // Basic Validation (Check if fields are filled) - More robust validation recommended
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const message = document.getElementById('message').value.trim();
+
+            if (!name || !email || !message) {
+                alert('Please fill out all fields.');
+                return;
+            }
+
+            // Collect form data (Example)
+            const formData = new FormData(contactForm);
+            const data = Object.fromEntries(formData.entries());
+
+            console.log('Form submitted (Placeholder). Data:', data);
+            alert('Thank you for your message, Shane will be in touch soon! (This is a placeholder)');
+
+            // HERE you would typically send the data to a backend endpoint:
+            // fetch(contactForm.action, {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' }, // Or appropriate header
+            //     body: JSON.stringify(data) // Or use FormData directly depending on backend
+            // })
+            // .then(response => response.json()) // Or response.text() etc.
+            // .then(result => {
+            //     console.log('Success:', result);
+            //     alert('Message sent successfully!');
+            //     contactForm.reset(); // Clear the form
+            // })
+            // .catch(error => {
+            //     console.error('Error:', error);
+            //     alert('There was an error sending your message. Please try again.');
+            // });
+
+            contactForm.reset(); // Clear form for demo
+        });
+    }
+
+    // Update Footer Year
+    const yearSpan = document.getElementById('current-year');
+    if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+    }
+
+}); // End DOMContentLoaded
